@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TRY OUT TKA FISIKA 2026 - SMAN 2 LUWU UTARA</title>
+<style>
+:root{--navy:#0b2d4d;--navy2:#123f66;--blue:#1f5f93;--pale:#eaf3fb;--line:#cbdbea;--green:#27a66f;--yellow:#e6ad22;--red:#d94b4b}
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(145deg,#eef5fb,#fff 50%,#e5f0f8);color:#16324b}
+.screen{display:none;min-height:100vh}.screen.active{display:flex;flex-direction:column}
+.header{background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;padding:18px;text-align:center;box-shadow:0 4px 18px #0b2d4d2b}
+.header h1{margin:0;font-size:22px;letter-spacing:.5px}.header p{margin:5px 0 0;font-size:12px;opacity:.9}
+.start-card,.result-card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 28px #0b2d4d18;max-width:520px;width:calc(100% - 30px);padding:28px;margin:auto}
+.form-group{margin:15px 0}label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+input{width:100%;padding:13px;border:2px solid var(--line);border-radius:10px;font-size:15px;background:#f6faff}
+.btn{border:0;border-radius:11px;padding:13px 18px;font-weight:800;cursor:pointer;width:100%}.primary{background:var(--navy);color:#fff}.secondary{background:var(--pale);color:var(--navy)}
+.info{background:var(--pale);border-left:4px solid var(--blue);padding:12px 14px;border-radius:8px;font-size:12px;line-height:1.6}
+.topbar{position:sticky;top:0;z-index:20;background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pinfo{font-size:12px;line-height:1.45}.pinfo b{font-size:14px}.timer{padding:7px 14px;border-radius:10px;background:#ffffff1f;text-align:center;min-width:105px}.timer .t{font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}.timer.warn{background:#b51f1f}
+.quiz-body{display:flex;gap:16px;max-width:1250px;width:100%;margin:auto;padding:16px}
+.nav{width:250px;flex:0 0 250px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 5px 18px #0b2d4d12;height:max-content;position:sticky;top:82px}
+.nav h3{margin:0 0 10px;color:var(--navy);font-size:14px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.navbtn{aspect-ratio:1;border:0;border-radius:8px;background:var(--red);color:#fff;font-weight:800;cursor:pointer}.navbtn.done{background:var(--green)}.navbtn.current{outline:3px solid var(--navy)}
+.summary{font-size:11px;color:#64788b;line-height:1.8;margin:12px 0}
+.content{flex:1;min-width:0}.question-card{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 5px 18px #0b2d4d12}.question-card.active{display:block}
+.qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}.qhead span{background:var(--navy);color:#fff;padding:7px 12px;border-radius:18px;font-weight:900;font-size:13px}.qhead b{font-size:11px;color:var(--blue);background:var(--pale);padding:7px 10px;border-radius:16px}
+.source-wrap{background:#fff;border:1px solid #dbe7f1;border-radius:10px;padding:16px;overflow:hidden}
+.text-question{font-size:15px;line-height:1.6;color:#16324b;margin-bottom:15px}
+.text-question p{margin:0 0 10px}
+.options-list{list-style-type:none;padding:0;margin:0}
+.options-list li{margin-bottom:8px;padding:10px 14px;background:#f6faff;border:1px solid var(--line);border-radius:8px;font-size:14px}
+.answer-box{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}.answer-hint{font-size:12px;color:#667b8d;margin-bottom:8px}.choices{display:flex;gap:8px;flex-wrap:wrap}
+.choice{width:52px;height:44px;border:2px solid var(--line);background:#fff;color:var(--navy);border-radius:10px;font-weight:900;cursor:pointer}.choice:hover{border-color:var(--blue)}.choice.selected{background:var(--navy);color:#fff;border-color:var(--navy)}
+.bottom{display:flex;gap:8px;margin-top:16px}.bottom button{flex:1}
+@media(max-width:800px){.quiz-body{flex-direction:column}.nav{width:100%;position:static;flex-basis:auto}.grid{grid-template-columns:repeat(10,1fr)}}
+@media(max-width:520px){.header h1{font-size:18px}.quiz-body{padding:9px}.question-card{padding:12px}.choice{width:46px;height:40px}}
+</style>
+</head>
+<body ondragstart="return false">
+<section id="start" class="screen active">
+ <div class="header"><h1>TRY OUT TKA FISIKA 2026</h1><p>SMAN 2 LUWU UTARA • Bank Soal TKA Fisika SMA/MA/SMK 2026</p></div>
+ <div style="flex:1;display:flex;padding:22px 0"><div class="start-card">
+  <h2 style="color:var(--navy);margin-top:0">Formulir Data Peserta</h2>
+  <p style="font-size:13px;color:#6d7f90">Isi data sebelum memulai ujian.</p>
+  <div class="form-group"><label>NAMA LENGKAP</label><input id="nama" autocomplete="off"></div>
+  <div class="form-group"><label>NISN</label><input id="nisn" autocomplete="off" inputmode="numeric"></div>
+  <div class="info"><b>Ketentuan Ujian:</b><br>• Jumlah Soal: 25 Nomor Pilihan Ganda.<br>• Alokasi Waktu: 75 Menit.<br>• Pilihlah salah satu opsi jawaban (A, B, C, D, atau E) yang paling tepat.<br>• Gunakan panel navigasi untuk berpindah antar soal.</div>
+  <button class="btn primary" style="margin-top:18px" onclick="mulai()">🚀 MULAI TRY OUT</button>
+ </div></div>
+</section>
+
+<section id="quiz" class="screen">
+ <div class="topbar"><div class="pinfo"><b id="tb-nama">-</b><br>NISN: <span id="tb-nisn">-</span> • SMAN 2 LUWU UTARA</div><div id="timerBox" class="timer"><small>SISA WAKTU</small><div class="t" id="timer">75:00</div></div></div>
+ <div class="quiz-body">
+  <aside class="nav">
+   <h3>NAVIGASI SOAL</h3>
+   <div class="grid">
+    <button class="navbtn" id="nav1" onclick="goTo(1)">1</button><button class="navbtn" id="nav2" onclick="goTo(2)">2</button><button class="navbtn" id="nav3" onclick="goTo(3)">3</button><button class="navbtn" id="nav4" onclick="goTo(4)">4</button><button class="navbtn" id="nav5" onclick="goTo(5)">5</button>
+    <button class="navbtn" id="nav6" onclick="goTo(6)">6</button><button class="navbtn" id="nav7" onclick="goTo(7)">7</button><button class="navbtn" id="nav8" onclick="goTo(8)">8</button><button class="navbtn" id="nav9" onclick="goTo(9)">9</button><button class="navbtn" id="nav10" onclick="goTo(10)">10</button>
+    <button class="navbtn" id="nav11" onclick="goTo(11)">11</button><button class="navbtn" id="nav12" onclick="goTo(12)">12</button><button class="navbtn" id="nav13" onclick="goTo(13)">13</button><button class="navbtn" id="nav14" onclick="goTo(14)">14</button><button class="navbtn" id="nav15" onclick="goTo(15)">15</button>
+    <button class="navbtn" id="nav16" onclick="goTo(16)">16</button><button class="navbtn" id="nav17" onclick="goTo(17)">17</button><button class="navbtn" id="nav18" onclick="goTo(18)">18</button><button class="navbtn" id="nav19" onclick="goTo(19)">19</button><button class="navbtn" id="nav20" onclick="goTo(20)">20</button>
+    <button class="navbtn" id="nav21" onclick="goTo(21)">21</button><button class="navbtn" id="nav22" onclick="goTo(22)">22</button><button class="navbtn" id="nav23" onclick="goTo(23)">23</button><button class="navbtn" id="nav24" onclick="goTo(24)">24</button><button class="navbtn" id="nav25" onclick="goTo(25)">25</button>
+   </div>
+   <div class="summary">Terjawab: <b id="answered">0</b>/25<br>Belum dijawab: <b id="remain">25</b></div>
+   <button class="btn" style="background:#d94b4b;color:#fff" onclick="submit()">📤 KIRIM JAWABAN</button>
+  </aside>
+
+  <main class="content">
+   <div id="qnum" style="font-weight:900;color:var(--navy);margin:0 0 8px 4px">SOAL 1/25</div>
+
+   <!-- SOAL 1 -->
+   <section class="question-card" id="q1" data-q="1">
+    <div class="qhead"><span>SOAL 1/25</span><b>KINEMATIKA GERAK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah mobil bergerak lurus dengan kecepatan awal 10 m/s. Mobil tersebut mengalami percepatan konstan sebesar 2 m/s² selama 5 detik. Berapakah jarak total yang ditempuh mobil selama selang waktu tersebut?</p>
+      <ul class="options-list">
+       <li><b>A.</b> 50 meter</li>
+       <li><b>B.</b> 60 meter</li>
+       <li><b>C.</b> 75 meter</li>
+       <li><b>D.</b> 85 meter</li>
+       <li><b>E.</b> 100 meter</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 1:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(1, 'A')">A</button><button class="choice" onclick="selectChoice(1, 'B')">B</button><button class="choice" onclick="selectChoice(1, 'C')">C</button><button class="choice" onclick="selectChoice(1, 'D')">D</button><button class="choice" onclick="selectChoice(1, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 2 -->
+   <section class="question-card" id="q2" data-q="2">
+    <div class="qhead"><span>SOAL 2/25</span><b>HUKUM NEWTON</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah benda bermassa 4 kg ditarik pada permukaan datar yang licin dengan gaya konstan F = 20 N membentuk sudut 60° terhadap arah horizontal. Besar percepatan yang dialami benda tersebut adalah... (cos 60° = 0,5)</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2,5 m/s²</li>
+       <li><b>B.</b> 4,0 m/s²</li>
+       <li><b>C.</b> 5,0 m/s²</li>
+       <li><b>D.</b> 8,6 m/s²</li>
+       <li><b>E.</b> 10,0 m/s²</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 2:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(2, 'A')">A</button><button class="choice" onclick="selectChoice(2, 'B')">B</button><button class="choice" onclick="selectChoice(2, 'C')">C</button><button class="choice" onclick="selectChoice(2, 'D')">D</button><button class="choice" onclick="selectChoice(2, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 3 -->
+   <section class="question-card" id="q3" data-q="3">
+    <div class="qhead"><span>SOAL 3/25</span><b>USAHA DAN ENERGI</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah benda bermassa 2 kg dijatuhkan bebas dari ketinggian 20 meter di atas tanah. Jika percepatan gravitasi g = 10 m/s², berapakah energi kinetik benda saat berada pada ketinggian 5 meter dari tanah?</p>
+      <ul class="options-list">
+       <li><b>A.</b> 100 Joule</li>
+       <li><b>B.</b> 200 Joule</li>
+       <li><b>C.</b> 300 Joule</li>
+       <li><b>D.</b> 400 Joule</li>
+       <li><b>E.</b> 500 Joule</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 3:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(3, 'A')">A</button><button class="choice" onclick="selectChoice(3, 'B')">B</button><button class="choice" onclick="selectChoice(3, 'C')">C</button><button class="choice" onclick="selectChoice(3, 'D')">D</button><button class="choice" onclick="selectChoice(3, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 4 -->
+   <section class="question-card" id="q4" data-q="4">
+    <div class="qhead"><span>SOAL 4/25</span><b>IMPULS DAN MOMENTUM</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Bola kasti bermassa 0,2 kg dilempar horizontal ke kanan dengan kecepatan 10 m/s. Setelah dipukul, bola bergerak ke kiri dengan kecepatan 20 m/s. Besar impuls yang diberikan pemukul pada bola adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2 N.s</li>
+       <li><b>B.</b> 4 N.s</li>
+       <li><b>C.</b> 6 N.s</li>
+       <li><b>D.</b> 8 N.s</li>
+       <li><b>E.</b> 10 N.s</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 4:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(4, 'A')">A</button><button class="choice" onclick="selectChoice(4, 'B')">B</button><button class="choice" onclick="selectChoice(4, 'C')">C</button><button class="choice" onclick="selectChoice(4, 'D')">D</button><button class="choice" onclick="selectChoice(4, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 5 -->
+   <section class="question-card" id="q5" data-q="5">
+    <div class="qhead"><span>SOAL 5/25</span><b>DINAMIKA ROTASI</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah roda berbentuk silinder pejal bermassa 5 kg dan jari-jari 20 cm berotasi pada porosnya. Jika roda diberi momen gaya konstan sebesar 4 Nm, percepatan sudut yang dialami roda tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 10 rad/s²</li>
+       <li><b>B.</b> 20 rad/s²</li>
+       <li><b>C.</b> 30 rad/s²</li>
+       <li><b>D.</b> 40 rad/s²</li>
+       <li><b>E.</b> 50 rad/s²</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 5:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(5, 'A')">A</button><button class="choice" onclick="selectChoice(5, 'B')">B</button><button class="choice" onclick="selectChoice(5, 'C')">C</button><button class="choice" onclick="selectChoice(5, 'D')">D</button><button class="choice" onclick="selectChoice(5, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 6 -->
+   <section class="question-card" id="q6" data-q="6">
+    <div class="qhead"><span>SOAL 6/25</span><b>GAYA MAGNETIK (LORENTZ)</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah kawat lurus sepanjang 50 cm dialiri arus listrik sebesar 4 A di dalam medan magnet homogen 0,2 T. Jika sudut antara kawat dan arah medan magnet adalah 30°, besar gaya Lorentz pada kawat adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 0,1 N</li>
+       <li><b>B.</b> 0,2 N</li>
+       <li><b>C.</b> 0,4 N</li>
+       <li><b>D.</b> 0,5 N</li>
+       <li><b>E.</b> 2,0 N</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 6:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(6, 'A')">A</button><button class="choice" onclick="selectChoice(6, 'B')">B</button><button class="choice" onclick="selectChoice(6, 'C')">C</button><button class="choice" onclick="selectChoice(6, 'D')">D</button><button class="choice" onclick="selectChoice(6, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 7 -->
+   <section class="question-card" id="q7" data-q="7">
+    <div class="qhead"><span>SOAL 7/25</span><b>FLUIDA STATIS</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah dongkrak hidrolik memiliki penampang kecil berdiameter 4 cm dan penampang besar berdiameter 20 cm. Jika pada penampang kecil diberikan gaya sebesar 100 N, maka gaya maksimum yang dapat dihasilkan pada penampang besar adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 500 N</li>
+       <li><b>B.</b> 1.000 N</li>
+       <li><b>C.</b> 2.500 N</li>
+       <li><b>D.</b> 5.000 N</li>
+       <li><b>E.</b> 10.000 N</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 7:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(7, 'A')">A</button><button class="choice" onclick="selectChoice(7, 'B')">B</button><button class="choice" onclick="selectChoice(7, 'C')">C</button><button class="choice" onclick="selectChoice(7, 'D')">D</button><button class="choice" onclick="selectChoice(7, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 8 -->
+   <section class="question-card" id="q8" data-q="8">
+    <div class="qhead"><span>SOAL 8/25</span><b>FLUIDA DINAMIS</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Air mengalir melalui pipa mendatar yang memiliki luas penampang berbeda. Pada pipa dengan luas penampang 10 cm², kecepatan aliran air adalah 4 m/s. Kecepatan aliran air pada bagian pipa yang memiliki luas penampang 5 cm² adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 1 m/s</li>
+       <li><b>B.</b> 2 m/s</li>
+       <li><b>C.</b> 4 m/s</li>
+       <li><b>D.</b> 8 m/s</li>
+       <li><b>E.</b> 16 m/s</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 8:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(8, 'A')">A</button><button class="choice" onclick="selectChoice(8, 'B')">B</button><button class="choice" onclick="selectChoice(8, 'C')">C</button><button class="choice" onclick="selectChoice(8, 'D')">D</button><button class="choice" onclick="selectChoice(8, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 9 -->
+   <section class="question-card" id="q9" data-q="9">
+    <div class="qhead"><span>SOAL 9/25</span><b>SUHU DAN KALOR</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Air sebanyak 200 gram bersuhu 30°C dicampur dengan 100 gram air bersuhu 90°C. Jika tidak ada kalor yang hilang ke lingkungan, maka suhu akhir campuran tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 45°C</li>
+       <li><b>B.</b> 50°C</li>
+       <li><b>C.</b> 55°C</li>
+       <li><b>D.</b> 60°C</li>
+       <li><b>E.</b> 65°C</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 9:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(9, 'A')">A</button><button class="choice" onclick="selectChoice(9, 'B')">B</button><button class="choice" onclick="selectChoice(9, 'C')">C</button><button class="choice" onclick="selectChoice(9, 'D')">D</button><button class="choice" onclick="selectChoice(9, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 10 -->
+   <section class="question-card" id="q10" data-q="10">
+    <div class="qhead"><span>SOAL 10/25</span><b>TEORI KINETIK GAS</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Gas ideal di dalam wadah tertutup memiliki suhu mutlak T dan energi kinetik rata-rata partikel E<sub>k</sub>. Jika suhu gas dinaikkan menjadi 3 T, maka energi kinetik rata-rata molekul gas tersebut menjadi...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 1/3 E<sub>k</sub></li>
+       <li><b>B.</b> E<sub>k</sub></li>
+       <li><b>C.</b> 2 E<sub>k</sub></li>
+       <li><b>D.</b> 3 E<sub>k</sub></li>
+       <li><b>E.</b> 9 E<sub>k</sub></li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 10:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(10, 'A')">A</button><button class="choice" onclick="selectChoice(10, 'B')">B</button><button class="choice" onclick="selectChoice(10, 'C')">C</button><button class="choice" onclick="selectChoice(10, 'D')">D</button><button class="choice" onclick="selectChoice(10, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 11 -->
+   <section class="question-card" id="q11" data-q="11">
+    <div class="qhead"><span>SOAL 11/25</span><b>TERMODINAMIKA</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah mesin Carnot bekerja di antara reservoir suhu tinggi 800 K dan reservoir suhu rendah 500 K. Efisiensi maksimum yang dapat dicapai mesin Carnot tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 25,0%</li>
+       <li><b>B.</b> 37,5%</li>
+       <li><b>C.</b> 50,0%</li>
+       <li><b>D.</b> 62,5%</li>
+       <li><b>E.</b> 75,0%</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 11:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(11, 'A')">A</button><button class="choice" onclick="selectChoice(11, 'B')">B</button><button class="choice" onclick="selectChoice(11, 'C')">C</button><button class="choice" onclick="selectChoice(11, 'D')">D</button><button class="choice" onclick="selectChoice(11, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 12 -->
+   <section class="question-card" id="q12" data-q="12">
+    <div class="qhead"><span>SOAL 12/25</span><b>GELOMBANG MEKANIK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Persamaan gelombang berjalan pada seutas tali dinyatakan oleh y = 0,04 sin π(8t - 2x) dalam satuan SI. Cepat rambat gelombang tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2 m/s</li>
+       <li><b>B.</b> 4 m/s</li>
+       <li><b>C.</b> 8 m/s</li>
+       <li><b>D.</b> 16 m/s</li>
+       <li><b>E.</b> 32 m/s</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 12:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(12, 'A')">A</button><button class="choice" onclick="selectChoice(12, 'B')">B</button><button class="choice" onclick="selectChoice(12, 'C')">C</button><button class="choice" onclick="selectChoice(12, 'D')">D</button><button class="choice" onclick="selectChoice(12, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 13 -->
+   <section class="question-card" id="q13" data-q="13">
+    <div class="qhead"><span>SOAL 13/25</span><b>GELOMBANG BUNYI (DOPPLER)</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah mobil ambulans bergerak dengan kecepatan 20 m/s sambil membunyikan sirine bernada 640 Hz. Mobil tersebut bergerak mendekati seorang pengamat yang diam di pinggir jalan. Jika cepat rambat bunyi di udara 340 m/s, frekuensi sirine yang didengar pengamat adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 600 Hz</li>
+       <li><b>B.</b> 640 Hz</li>
+       <li><b>C.</b> 680 Hz</li>
+       <li><b>D.</b> 720 Hz</li>
+       <li><b>E.</b> 760 Hz</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 13:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(13, 'A')">A</button><button class="choice" onclick="selectChoice(13, 'B')">B</button><button class="choice" onclick="selectChoice(13, 'C')">C</button><button class="choice" onclick="selectChoice(13, 'D')">D</button><button class="choice" onclick="selectChoice(13, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 14 -->
+   <section class="question-card" id="q14" data-q="14">
+    <div class="qhead"><span>SOAL 14/25</span><b>OPTIKA GEOMETRI</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah benda diletakkan pada jarak 15 cm di depan cermin cekung yang memiliki jarak fokus 10 cm. Sifat bayangan yang terbentuk adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> Maya, tegak, diperbesar</li>
+       <li><b>B.</b> Maya, tegak, diperkecil</li>
+       <li><b>C.</b> Nyata, terbalik, diperbesar</li>
+       <li><b>D.</b> Nyata, terbalik, diperkecil</li>
+       <li><b>E.</b> Nyata, terbalik, sama besar</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 14:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(14, 'A')">A</button><button class="choice" onclick="selectChoice(14, 'B')">B</button><button class="choice" onclick="selectChoice(14, 'C')">C</button><button class="choice" onclick="selectChoice(14, 'D')">D</button><button class="choice" onclick="selectChoice(14, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 15 -->
+   <section class="question-card" id="q15" data-q="15">
+    <div class="qhead"><span>SOAL 15/25</span><b>ALAT-ALAT OPTIK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Seseorang penderita mikroskopis (rabun dekat) tidak dapat melihat jelas benda yang terletak lebih dekat dari 50 cm. Kekuatan lensa kacamata yang dibutuhkan agar orang tersebut dapat membaca normal pada jarak 25 cm adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> +1,0 Dioptri</li>
+       <li><b>B.</b> +1,5 Dioptri</li>
+       <li><b>C.</b> +2,0 Dioptri</li>
+       <li><b>D.</b> +2,5 Dioptri</li>
+       <li><b>E.</b> +3,0 Dioptri</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 15:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(15, 'A')">A</button><button class="choice" onclick="selectChoice(15, 'B')">B</button><button class="choice" onclick="selectChoice(15, 'C')">C</button><button class="choice" onclick="selectChoice(15, 'D')">D</button><button class="choice" onclick="selectChoice(15, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 16 -->
+   <section class="question-card" id="q16" data-q="16">
+    <div class="qhead"><span>SOAL 16/25</span><b>GAYA ELEKTROSTATIK (HUKUM COULOMB)</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Dua muatan titik q<sub>1</sub> = +2 µC dan q<sub>2</sub> = +8 µC terpisah sejauh r di udara dan mengalami gaya tolak-menolak sebesar F. Jika jarak kedua muatan diubah menjadi 2r, maka gaya tolak-menolaknya menjadi...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 1/4 F</li>
+       <li><b>B.</b> 1/2 F</li>
+       <li><b>C.</b> F</li>
+       <li><b>D.</b> 2 F</li>
+       <li><b>E.</b> 4 F</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 16:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(16, 'A')">A</button><button class="choice" onclick="selectChoice(16, 'B')">B</button><button class="choice" onclick="selectChoice(16, 'C')">C</button><button class="choice" onclick="selectChoice(16, 'D')">D</button><button class="choice" onclick="selectChoice(16, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 17 -->
+   <section class="question-card" id="q17" data-q="17">
+    <div class="qhead"><span>SOAL 17/25</span><b>KAPASITOR</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Tiga buah kapasitor identik bermuatan C disusun secara seri, kemudian dihubungkan dengan sumber tegangan V. Kapasitas total rangkaian pengganti ketiga kapasitor tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 1/3 C</li>
+       <li><b>B.</b> 1/2 C</li>
+       <li><b>C.</b> C</li>
+       <li><b>D.</b> 2 C</li>
+       <li><b>E.</b> 3 C</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 17:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(17, 'A')">A</button><button class="choice" onclick="selectChoice(17, 'B')">B</button><button class="choice" onclick="selectChoice(17, 'C')">C</button><button class="choice" onclick="selectChoice(17, 'D')">D</button><button class="choice" onclick="selectChoice(17, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 18 -->
+   <section class="question-card" id="q18" data-q="18">
+    <div class="qhead"><span>SOAL 18/25</span><b>RANGKAIAN ARUS SEARAH (DC)</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Dua buah hambatan R<sub>1</sub> = 6 Ω dan R<sub>2</sub> = 3 Ω dirangkai secara paralel, lalu dihubungkan dengan tegangan 12 Volt. Kuat arus total yang mengalir dalam rangkaian tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2 A</li>
+       <li><b>B.</b> 4 A</li>
+       <li><b>C.</b> 6 A</li>
+       <li><b>D.</b> 8 A</li>
+       <li><b>E.</b> 12 A</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 18:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(18, 'A')">A</button><button class="choice" onclick="selectChoice(18, 'B')">B</button><button class="choice" onclick="selectChoice(18, 'C')">C</button><button class="choice" onclick="selectChoice(18, 'D')">D</button><button class="choice" onclick="selectChoice(18, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 19 -->
+   <section class="question-card" id="q19" data-q="19">
+    <div class="qhead"><span>SOAL 19/25</span><b>INDUKSI ELEKTROMAGNETIK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah kumparan terdiri atas 200 lilitan berada dalam medan magnetik yang berubah secara konstan dari 0,1 Tesla menjadi 0,5 Tesla dalam selang waktu 0,2 detik. Jika luas penampang kumparan 100 cm², besar GGL induksi yang timbul pada kumparan adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2 Volt</li>
+       <li><b>B.</b> 4 Volt</li>
+       <li><b>C.</b> 6 Volt</li>
+       <li><b>D.</b> 8 Volt</li>
+       <li><b>E.</b> 10 Volt</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 19:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(19, 'A')">A</button><button class="choice" onclick="selectChoice(19, 'B')">B</button><button class="choice" onclick="selectChoice(19, 'C')">C</button><button class="choice" onclick="selectChoice(19, 'D')">D</button><button class="choice" onclick="selectChoice(19, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 20 -->
+   <section class="question-card" id="q20" data-q="20">
+    <div class="qhead"><span>SOAL 20/25</span><b>RANGKAIAN ARUS BOLAK-BALIK (AC)</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Rangkaian seri R-L-C memiliki hambatan R = 30 Ω, reaktansi induktif X<sub>L</sub> = 80 Ω, dan reaktansi kapasitif X<sub>C</sub> = 40 Ω. Besar impedansi total rangkaian R-L-C tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 30 Ω</li>
+       <li><b>B.</b> 40 Ω</li>
+       <li><b>C.</b> 50 Ω</li>
+       <li><b>D.</b> 70 Ω</li>
+       <li><b>E.</b> 110 Ω</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 20:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(20, 'A')">A</button><button class="choice" onclick="selectChoice(20, 'B')">B</button><button class="choice" onclick="selectChoice(20, 'C')">C</button><button class="choice" onclick="selectChoice(20, 'D')">D</button><button class="choice" onclick="selectChoice(20, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 21 -->
+   <section class="question-card" id="q21" data-q="21">
+    <div class="qhead"><span>SOAL 21/25</span><b>RELATIVITAS KHUSUS</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Sebuah pesawat antariksa bergerak dengan kecepatan 0,6 c (c = kecepatan cahaya) terhadap bumi. Menurut pengamat di bumi, panjang pesawat tersebut terukur 80 meter. Panjang pesawat sebenarnya saat diam adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 60 meter</li>
+       <li><b>B.</b> 80 meter</li>
+       <li><b>C.</b> 100 meter</li>
+       <li><b>D.</b> 120 meter</li>
+       <li><b>E.</b> 150 meter</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 21:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(21, 'A')">A</button><button class="choice" onclick="selectChoice(21, 'B')">B</button><button class="choice" onclick="selectChoice(21, 'C')">C</button><button class="choice" onclick="selectChoice(21, 'D')">D</button><button class="choice" onclick="selectChoice(21, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 22 -->
+   <section class="question-card" id="q22" data-q="22">
+    <div class="qhead"><span>SOAL 22/25</span><b>FOTON DAN EFEK FOTOLESTRIK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Fungsi kerja suatu logam adalah 3,3 × 10<sup>-19</sup> Joule. Jika konstanta Planck h = 6,6 × 10<sup>-34</sup> J.s, maka frekuensi ambang minimum cahaya agar terjadi efek fotolistrik pada logam tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 2,5 × 10<sup>14</sup> Hz</li>
+       <li><b>B.</b> 5,0 × 10<sup>14</sup> Hz</li>
+       <li><b>C.</b> 7,5 × 10<sup>14</sup> Hz</li>
+       <li><b>D.</b> 1,0 × 10<sup>15</sup> Hz</li>
+       <li><b>E.</b> 2,0 × 10<sup>15</sup> Hz</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 22:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(22, 'A')">A</button><button class="choice" onclick="selectChoice(22, 'B')">B</button><button class="choice" onclick="selectChoice(22, 'C')">C</button><button class="choice" onclick="selectChoice(22, 'D')">D</button><button class="choice" onclick="selectChoice(22, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 23 -->
+   <section class="question-card" id="q23" data-q="23">
+    <div class="qhead"><span>SOAL 23/25</span><b>FISIKA INTI DAN RADIOAKTIVITAS</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Suatu unsur radioaktif memiliki waktu paruh 4 hari. Jika massa awal unsur radioaktif tersebut adalah 16 gram, massa zat yang tersisa setelah meluruh selama 12 hari adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> 1 gram</li>
+       <li><b>B.</b> 2 gram</li>
+       <li><b>C.</b> 4 gram</li>
+       <li><b>D.</b> 6 gram</li>
+       <li><b>E.</b> 8 gram</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 23:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(23, 'A')">A</button><button class="choice" onclick="selectChoice(23, 'B')">B</button><button class="choice" onclick="selectChoice(23, 'C')">C</button><button class="choice" onclick="selectChoice(23, 'D')">D</button><button class="choice" onclick="selectChoice(23, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 24 -->
+   <section class="question-card" id="q24" data-q="24">
+    <div class="qhead"><span>SOAL 24/25</span><b>GELOMBANG ELEKTROMAGNETIK</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Gelombang elektromagnetik yang digunakan dalam komunikasi jarak jauh serta transmisi radio dan televisi adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> Sinar Gamma</li>
+       <li><b>B.</b> Sinar-X</li>
+       <li><b>C.</b> Sinar Ultraviolet</li>
+       <li><b>D.</b> Gelombang Radio dan Mikro</li>
+       <li><b>E.</b> Sinar Inframerah</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 24:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(24, 'A')">A</button><button class="choice" onclick="selectChoice(24, 'B')">B</button><button class="choice" onclick="selectChoice(24, 'C')">C</button><button class="choice" onclick="selectChoice(24, 'D')">D</button><button class="choice" onclick="selectChoice(24, 'E')">E</button></div>
+    </div>
+   </section>
+
+   <!-- SOAL 25 -->
+   <section class="question-card" id="q25" data-q="25">
+    <div class="qhead"><span>SOAL 25/25</span><b>ENERGI TERBARUKAN</b></div>
+    <div class="source-wrap">
+     <div class="text-question">
+      <p>Pembangkit Listrik Tenaga Surya (PLTS) memanfaatkan salah satu komponen semikonduktor yang dapat mengubah energi foton cahaya matahari secara langsung menjadi energi listrik. Komponen tersebut adalah...</p>
+      <ul class="options-list">
+       <li><b>A.</b> Sel Fotovoltaik (Solar Cell)</li>
+       <li><b>B.</b> Generator AC</li>
+       <li><b>C.</b> Transformator Step-Up</li>
+       <li><b>D.</b> Turbin Uap</li>
+       <li><b>E.</b> Akumulator (Aki)</li>
+      </ul>
+     </div>
+    </div>
+    <div class="answer-box">
+     <div class="answer-hint">Pilih Jawaban Soal Nomor 25:</div>
+     <div class="choices"><button class="choice" onclick="selectChoice(25, 'A')">A</button><button class="choice" onclick="selectChoice(25, 'B')">B</button><button class="choice" onclick="selectChoice(25, 'C')">C</button><button class="choice" onclick="selectChoice(25, 'D')">D</button><button class="choice" onclick="selectChoice(25, 'E')">E</button></div>
+    </div>
+   </section>
+
+  </main>
+ </div>
+</section>
+
+<script>
+let answers = {};
+function mulai() {
+  const nama = document.getElementById('nama').value;
+  const nisn = document.getElementById('nisn').value;
+  if (!nama || !nisn) { alert('Harap isi Nama dan NISN terlebih dahulu!'); return; }
+  document.getElementById('tb-nama').innerText = nama;
+  document.getElementById('tb-nisn').innerText = nisn;
+  document.getElementById('start').classList.remove('active');
+  document.getElementById('quiz').classList.add('active');
+  goTo(1);
+}
+function goTo(n) {
+  document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('current'));
+  const card = document.getElementById('q' + n);
+  if (card) card.classList.add('active');
+  const btn = document.getElementById('nav' + n);
+  if (btn) btn.classList.add('current');
+  document.getElementById('qnum').innerText = `SOAL ${n}/25`;
+}
+function selectChoice(q, val) {
+  answers[q] = val;
+  const card = document.getElementById('q' + q);
+  if (card) {
+    card.querySelectorAll('.choice').forEach(b => {
+      b.classList.toggle('selected', b.innerText === val);
+    });
+  }
+  const btn = document.getElementById('nav' + q);
+  if (btn) btn.classList.add('done');
+  updateSummary();
+}
+function updateSummary() {
+  const count = Object.keys(answers).length;
+  document.getElementById('answered').innerText = count;
+  document.getElementById('remain').innerText = 25 - count;
+}
+function submit() {
+  const count = Object.keys(answers).length;
+  if (confirm(`Anda telah menjawab ${count} dari 25 soal. Yakin ingin mengirim jawaban?`)) {
+    alert('Jawaban Try Out berhasil dikirim!');
+  }
+}
+</script>
+</body>
+</html>
